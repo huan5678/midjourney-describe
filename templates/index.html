@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          container: {
+            center: true,
+            padding: '1rem',
+          },
+          extend: {
+            colors: {
+              primary: {
+                50: '#f4f4f6',
+                100: '#eaeaed',
+                200: '#cacad2',
+                300: '#aaabb7',
+                400: '#6a6b81',
+                500: '#2a2c4b',
+                600: '#262844',
+                700: '#202138',
+                800: '#191a2d',
+                900: '#151625',
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <!-- <script src="static/script.js" defer></script> -->
+    <title>Process String</title>
+  </head>
+  <body class="bg-primary-200">
+    <main class="container">
+      <from class="flex flex-col gap-4 py-4">
+        <h1 class="text-4xl">Midjourney Describe Prompt Processor</h1>
+        <label
+          for="input_string"
+          class="block text-sm font-medium font-semibold leading-6 text-primary-900"
+          >Input String:
+        </label>
+        <textarea
+          id="input_string"
+          rows="10"
+          cols="50"
+          class="block bg-primary-100 w-full rounded-lg border-0 py-1.5 text-primary-900 shadow-sm ring-1 ring-inset ring-primary-300 placeholder:text-primary-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+        ></textarea>
+        <div class="flex flex-row items-center justify-between">
+          <div class="flex flex-row items-center gap-4">
+            <div class="flex flex-col gap-1">
+              <label
+                for="ar"
+                class="block text-sm font-medium font-semibold leading-6 text-primary-900"
+                >AR:
+              </label>
+              <input
+                type="text"
+                id="ar"
+                class="block bg-primary-100 w-full border-0 rounded-lg py-1.5 text-primary-900 shadow-sm ring-1 ring-inset ring-primary-300 placeholder:text-primary-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label
+                for="prefix"
+                class="block text-sm font-medium font-semibold leading-6 text-primary-900"
+                >Prefix:
+              </label>
+              <input
+                type="text"
+                id="prefix"
+                class="block bg-primary-100 w-full border-0 py-1.5 rounded-lg text-primary-900 shadow-sm ring-1 ring-inset ring-primary-300 placeholder:text-primary-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+                value="5, n5, se, sc"
+              />
+            </div>
+          </div>
+          <div class="flex flex-row items-center gap-4">
+            <button
+              type="button"
+              id="process"
+              class="px-6 py-3 text-sm font-semibold transition duration-300 ease-in-out border-0 rounded-md shadow-sm text-primary-100 outline-primary-500 outline border-primary-500 bg-primary-400 hover:bg-primary-700 hover:text-primary-50 hover:outline-primary-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+            >
+              Process
+            </button>
+            <button
+              type="button"
+              id="copy"
+              class="px-6 py-3 text-sm font-semibold transition duration-300 ease-in-out border-0 rounded-md shadow-sm outline-primary-500 outline text-primary-500 border-primary-500 hover:bg-amber-400 hover:text-primary-50 hover:outline-amber-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+            >
+              CopyResult
+            </button>
+            <button
+              type="button"
+              id="clear"
+              class="px-6 py-3 text-sm font-semibold transition duration-300 ease-in-out border-0 rounded-md shadow-sm outline-primary-500 outline text-primary-500 border-primary-500 hover:bg-red-400 hover:text-primary-50 hover:outline-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+            >
+              ClearInput
+            </button>
+          </div>
+        </div>
+      </from>
+      <div id="results"></div>
+    </main>
+    <script>
+document.addEventListener("DOMContentLoaded", function() {
+  const processButton = document.getElementById("process");
+  const clearButton = document.getElementById("clear");
+  const copyButton = document.getElementById("copy");
+  const inputTextArea = document.getElementById("input_string");
+  const resultsDiv = document.getElementById("results");
+
+  processButton.addEventListener("click", async function() {
+    const input_string = inputTextArea.value;
+    const prefix = document.getElementById("prefix").value;
+    const ar = document.getElementById("ar").value;
+
+    const response = await fetch("/process", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        input_string: input_string,
+        prefix: prefix,
+        ar: ar
+      })
+    });
+
+    const result = await response.text();
+    resultsDiv.innerHTML = `<textarea readonly rows="4" cols="50" class="block bg-primary-100 w-full rounded-lg border-0 py-1.5 text-primary-900 shadow-sm ring-1 ring-inset ring-primary-300 placeholder:text-primary-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6">${result}</textarea>`;
+  });
+
+  clearButton.addEventListener("click", function() {
+    inputTextArea.value = "";
+  });
+
+  copyButton.addEventListener("click", function() {
+    const resultTextArea = document.querySelector("#results textarea");
+    if (resultTextArea) {
+      resultTextArea.select();
+      document.execCommand("copy");
+    }
+  });
+});
+</script>
+
+  </body>
+</html>
