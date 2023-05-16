@@ -37,7 +37,7 @@ def process_string(input_string, prefix, ar):
     joined_lines = ','.join(lines).rstrip(',')
     joined_lines = re.sub(r',,', ',', joined_lines)
 
-    final_string = f'{{{joined_lines}}}'
+    final_string = f'/imagine prompt: {{{joined_lines}}}'
     if ar != "":
         final_string += f' --ar {ar}'
     final_string += f' --{{{prefix}}}'
