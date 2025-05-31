@@ -51,7 +51,7 @@
           cols="50"
           class="block bg-primary-100 w-full rounded-lg border-0 py-1.5 text-primary-900 shadow-sm ring-1 ring-inset ring-primary-300 placeholder:text-primary-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
         ></textarea>
-        <div class="flex flex-row items-center justify-between">
+        <div class="flex flex-row flex-wrap gap-4 items-center justify-between">
           <div class="flex flex-row items-center gap-4">
             <div class="flex flex-col gap-1">
               <label
@@ -75,7 +75,7 @@
                 type="text"
                 id="prefix"
                 class="block bg-primary-100 w-full border-0 py-1.5 rounded-lg text-primary-900 shadow-sm ring-1 ring-inset ring-primary-300 placeholder:text-primary-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
-                value="5, n5, se, sc"
+                value="7 --p, n --p"
               />
             </div>
           </div>
@@ -113,11 +113,48 @@ document.addEventListener("DOMContentLoaded", function() {
   const copyButton = document.getElementById("copy");
   const inputTextArea = document.getElementById("input_string");
   const resultsDiv = document.getElementById("results");
+  const prefixInput = document.getElementById("prefix");
+  const arInput = document.getElementById("ar");
 
+  // 從 localStorage 讀取存儲的 prefix 和 ar，如果有的話
+  const savedPrefix = localStorage.getItem("midjourney_prefix");
+  if (savedPrefix) {
+    prefixInput.value = savedPrefix;
+  }
+
+  const savedAr = localStorage.getItem("midjourney_ar");
+  if (savedAr) {
+    arInput.value = savedAr;
+  }
+
+  // 監聽 prefix 輸入框的變化，並儲存到 localStorage
+  prefixInput.addEventListener("change", function() {
+    localStorage.setItem("midjourney_prefix", prefixInput.value);
+  });
+
+  // 也監聽 input 事件，這樣當使用者邊輸入時就會保存
+  prefixInput.addEventListener("input", function() {
+    localStorage.setItem("midjourney_prefix", prefixInput.value);
+  });
+
+  // 同樣為 ar 輸入框添加監聽事件
+  arInput.addEventListener("change", function() {
+    localStorage.setItem("midjourney_ar", arInput.value);
+  });
+
+  arInput.addEventListener("input", function() {
+    localStorage.setItem("midjourney_ar", arInput.value);
+  });
+
+  // 也可以在按下 Process 按鈕時儲存，以確保捕捉所有變更
   processButton.addEventListener("click", async function() {
     const input_string = inputTextArea.value;
-    const prefix = document.getElementById("prefix").value;
-    const ar = document.getElementById("ar").value;
+    const prefix = prefixInput.value;
+    const ar = arInput.value;
+
+    // 儲存當前的 prefix 和 ar 到 localStorage
+    localStorage.setItem("midjourney_prefix", prefix);
+    localStorage.setItem("midjourney_ar", ar);
 
     const response = await fetch("/process", {
       method: "POST",
